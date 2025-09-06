@@ -1,0 +1,131 @@
+namespace ContohKasirBaju
+{
+    public partial class Form1 : Form
+    {
+
+        // === 1. Daftar Barang (DATA TETAP) ===
+        Dictionary<string, (string Nama, int Harga)> daftarBarang = new Dictionary<string, (string, int)>
+        {
+            { "B001", ("Kemeja", 75000) },
+            { "B002", ("Celana Jeans", 120000) },
+            { "B003", ("Jaket Hoodie", 150000) },
+            { "B004", ("Kaos Polos", 50000) }
+        };
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            dgvDataBarang.AutoGenerateColumns = false;
+            dgvDataBarang.AllowUserToAddRows = false;
+            dgvDataBarang.Columns.Add("KodeBarang", "Kode Barang");
+            dgvDataBarang.Columns.Add("NamaBarang", "Nama Barang");
+            dgvDataBarang.Columns.Add("Harga", "Harga");
+            dgvDataBarang.Columns.Add("Jumlah", "Jumlah");
+            dgvDataBarang.Columns.Add("Subtotal", "Subtotal");
+
+            dgvTransaksi.AutoGenerateColumns = false;
+            dgvTransaksi.AllowUserToAddRows = false;
+            dgvTransaksi.Columns.Add("KodeBarang", "Kode Barang");
+            dgvTransaksi.Columns.Add("NamaBarang", "Nama Barang");
+            dgvTransaksi.Columns.Add("Harga", "Harga");
+            dgvTransaksi.Columns.Add("Jumlah", "Jumlah");
+            dgvTransaksi.Columns.Add("Subtotal", "Subtotal");
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (dgvDataBarang.Rows.Count == 0)
+            {
+                MessageBox.Show("Belum ada data di keranjang!");
+                return;
+            }
+
+            foreach (DataGridViewRow row in dgvDataBarang.Rows)
+            {
+                if (row.Cells["KodeBarang"].Value != null)
+                {
+                    string kode = row.Cells["Kode Barang"].Value.ToString();
+                    string nama = row.Cells["Nama Barang"].Value.ToString();
+                    int harga = Convert.ToInt32(row.Cells["Harga"].Value);
+                    int jumlah = Convert.ToInt32(row.Cells["Jumlah"].Value);
+                    int subtotal = Convert.ToInt32(row.Cells["Subtotal"].Value);
+
+                    // Pindah ke DataGridView Transaksi
+                    dgvTransaksi.Rows.Add(kode, nama, harga, jumlah, subtotal);
+                }
+            }
+
+            // Kosongkan keranjang setelah disimpan
+            dgvDataBarang.Rows.Clear();
+            txtTotal.Clear();
+            txtBayar.Clear();
+            txtKembali.Clear();
+
+            MessageBox.Show("Transaksi berhasil disimpan ke Tampil Data!");
+        }
+
+        private void txtKodeBarang_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnTambah_Click(object sender, EventArgs e)
+        {
+            string kode = txtKodeBarang.Text;
+
+            if (daftarBarang.ContainsKey(kode))
+            {
+                string nama = daftarBarang[kode].Nama;
+                int harga = daftarBarang[kode].Harga;
+                int jumlah = 1; // default
+                int subtotal = harga * jumlah;
+
+                dgvDataBarang.Rows.Add(kode, nama, harga, jumlah, subtotal);
+
+                HitungTotal();
+                txtKodeBarang.Clear();
+            }
+            else
+            {
+                MessageBox.Show("Kode barang tidak ditemukan!");
+            }
+        }
+        private void HitungTotal()
+        {
+           int total = 0; // mulai dari 0
+    foreach (DataGridViewRow row in dgvDataBarang.Rows)
+    {
+        if (row.Cells["Subtotal"].Value != null)
+            total += Convert.ToInt32(row.Cells["Subtotal"].Value);
+    }
+    txtTotal.Text = total.ToString();
+        }
+
+        private void txtTotal_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtBayar_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(txtBayar.Text, out int bayar) && int.TryParse(txtTotal.Text, out int total))
+            {
+                int kembali = bayar - total;
+                txtKembali.Text = kembali.ToString();
+            }
+            else
+            {
+                txtKembali.Clear();
+            }
+        }
+    }
+    }
